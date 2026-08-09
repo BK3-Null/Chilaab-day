@@ -788,17 +788,25 @@ Jangan lupa, kita bakal terus jalan bareng, ngejar mimpi, dan ngelewatin segala 
             bunnyY += velocity;
 
             // Spawning Tiang Neon Coquette
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 120) {
-                let gapHeight = 90; // Celah cukup lebar biar santai
-                let minPipeHeight = 30;
-                let topPipeHeight = Math.floor(Math.random() * (canvas.height - gapHeight - (minPipeHeight * 2))) + minPipeHeight;
-                pipes.push({
-                    x: canvas.width,
-                    top: topPipeHeight,
-                    bottom: canvas.height - topPipeHeight - gapHeight,
-                    passed: false
-                });
-            }
+         if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 160) {
+    
+    let gapHeight = 135; 
+    if (flappyScore >= 5 && flappyScore < 10) {
+        gapHeight = 115;
+    } else if (flappyScore >= 10) {
+        gapHeight = 95;
+    }
+
+    let minPipeHeight = 30;
+    let topPipeHeight = Math.floor(Math.random() * (canvas.height - gapHeight - (minPipeHeight * 2))) + minPipeHeight;
+    
+    pipes.push({
+        x: canvas.width,
+        top: topPipeHeight,
+        bottom: canvas.height - topPipeHeight - gapHeight,
+        passed: false
+    });
+}
 
             // Gerakkan Tiang
             pipes.forEach(pipe => { pipe.x -= pipeSpeed; });
