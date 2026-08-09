@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cila's Birthday Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --warna-border-monitor: #ffcc00;
+            --warna-bg-surat: #050f05;
+            --warna-teks-surat: #39ff14;
+            --warna-body-biru: #2b59c3;
+            
+            --spotify-purple-dark: #12072B;
+            --spotify-purple-light: #2A144E;
+            --spotify-purple-banner: #482380;
+            --spotify-green: #1DB954;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+   background-image: url('https://github.com/BK3-Null/Video_S-Library/blob/main/pink-abstract-5k-3840x2160-24766.jpg?raw=true'); 
+    background-size: cover;          /* Bikin gambar memenuhi seluruh layar */
+    background-position: center;     /* Gambar berada di tengah */
+    background-repeat: no-repeat;    /* Gambar gak bakal ngulang/tiling */
+    background-attachment: fixed;
+	
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Press Start 2P', monospace;
+            user-select: none;
+        }
+
+        .hidden { display: none !important; }
+
+        /* LOADING SCREEN */
+        #loading-screen {
+            display: flex; justify-content: center; align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #0d0d0d; z-index: 999;
+        }
+        .monitor-box {
+            border: 4px solid #39ff14; border-radius: 12px; padding: 35px 20px;
+            width: 90%; max-width: 450px; background-color: #051405;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.2); text-align: center;
+        }
+        .title-system { color: #39ff14; font-size: 1.2rem; letter-spacing: 2px; margin-bottom: 25px; }
+        .status-row { color: #39ff14; font-size: 0.55rem; line-height: 1.5; text-align: left; padding-left: 15px; margin-bottom: 20px; min-height: 35px; display: flex; align-items: center; }
+        .cursor-underscore { display: inline-block; margin-left: 5px; animation: smoothBlink 1s step-end infinite; }
+        .progress-container { width: 90%; height: 24px; border: 2px solid #248010; background-color: #102610; border-radius: 8px; margin: 0 auto 20px auto; position: relative; overflow: hidden; }
+        .progress-bar { height: 100%; width: 0%; background-color: #39ff14; box-shadow: 0 0 10px #39ff14; transition: width 0.05s linear; }
+        .percentage-text { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #39ff14; font-size: 0.6rem; z-index: 2; }
+        .footer-text { color: #ffcc00; font-size: 0.8rem; letter-spacing: 1px; margin-top: 15px; opacity: 0; transition: opacity 0.5s ease; }
+        .footer-text.show { opacity: 1; animation: textBlink 1.5s infinite; }
+
+        @keyframes smoothBlink { from, to { color: transparent } 50% { color: #39ff14 } }
+        @keyframes textBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* GAME BOY KONSOL */
+        #gameboy-screen { display: flex; justify-content: center; align-items: center; width: 100%; }
+        .gameboy-body {
+          background-image: url('https://github.com/BK3-Null/Video_S-Library/blob/main/little-twin-stars-3840x2160-16445.png?raw=true'); 
+    background-size: cover;          /* Bikin gambar pas di dalam bentuk gameboy */
+    background-position: center;     /* Mengatur posisi tengah gambar */
+    background-repeat: no-repeat;
+			
+			width: 95%; max-width: 430px; border-radius: 20px 20px 60px 20px;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.15), inset -5px -5px 10px rgba(0,0,0,0.05);
+            padding: 25px; display: flex; flex-direction: column; align-items: center; border: 4px solid #b5b7ad;
+        }
+        .gameboy-header { width: 100%; display: flex; justify-content: space-between; color: #7b7d74; font-size: 0.5rem; margin-bottom: 15px; padding: 0 10px; }
+        .power-led { display: flex; align-items: center; gap: 5px; }
+        .led-dot { width: 8px; height: 8px; background-color: #ff2a2a; border-radius: 50%; box-shadow: 0 0 5px #ff2a2a; }
+        .screen-frame { background-color: #717578; width: 100%; padding: 25px 35px 15px 35px; border-radius: 10px; box-shadow: inset 3px 3px 5px rgba(0,0,0,0.4); margin-bottom: 25px; position: relative; }
+        .lcd-screen { background-color: #8b966c; border: 3px solid #525940; height: 150px; border-radius: 4px; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10px; color: #0f1c02; }
+        .lcd-title { font-size: 1.1rem; line-height: 1.4; margin-bottom: 15px; }
+        .lcd-sub { font-size: 0.55rem; animation: textBlink 1.2s infinite; }
+        .screen-footer { display: flex; justify-content: space-between; color: #d1d4c9; font-size: 0.4rem; margin-top: 8px; }
+
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-bottom: 35px; }
+        .menu-btn { border: none; padding: 18px 10px; font-family: 'Press Start 2P', monospace; font-size: 0.65rem; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 5px 0px rgba(0,0,0,0.3), inset 0 -4px 0px rgba(0,0,0,0.2); transition: all 0.1s ease; text-transform: uppercase; }
+        .menu-btn:active { transform: translateY(4px); box-shadow: 0 1px 0px rgba(0,0,0,0.3); }
+        .btn-message { background-color: #3b82f6; }
+        .btn-gallery { background-color: #ef4444; }
+        .btn-music   { background-color: #8b5cf6; }
+        .btn-tetris  { background-color: #f472b6; }
+
+        .controls-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px; margin-bottom: 20px; }
+        .d-pad { position: relative; width: 90px; height: 90px; }
+        .d-pad-btn { position: absolute; background: transparent; border: none; cursor: pointer; z-index: 10; }
+        .d-btn-up { width: 30px; height: 30px; top: 0; left: 30px; }
+        .d-btn-down { width: 30px; height: 30px; bottom: 0; left: 30px; }
+        .d-btn-left { width: 30px; height: 30px; top: 30px; left: 0; }
+        .d-btn-right { width: 30px; height: 30px; top: 30px; right: 0; }
+        .d-pad-horizontal, .d-pad-vertical { background-color: #222; border-radius: 4px; position: absolute; box-shadow: 3px 3px 0px rgba(0,0,0,0.2); }
+        .d-pad-horizontal { width: 90px; height: 30px; top: 30px; left: 0; }
+        .d-pad-vertical { width: 30px; height: 90px; top: 0; left: 30px; }
+        .d-pad-center { position: absolute; width: 30px; height: 30px; background-color: #222; top: 30px; left: 30px; z-index: 2; }
+
+        .action-buttons { display: flex; gap: 15px; transform: rotate(-15px); }
+        .circle-btn { width: 45px; height: 45px; background-color: #a92323; border: none; border-radius: 50%; color: #e2e4d8; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 3px 3px 0px rgba(0,0,0,0.3); cursor: pointer; }
+        .circle-btn:active { transform: translateY(3px) translateX(1px); box-shadow: 0px 0px 0px; }
+
+        .system-buttons { display: flex; gap: 25px; margin-top: 10px; }
+        .pill-btn-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #7b7d74; font-size: 0.45rem; }
+        .pill-btn { width: 50px; height: 12px; background-color: #7b7d74; border: none; border-radius: 10px; transform: rotate(-20px); box-shadow: 2px 2px 0px rgba(0,0,0,0.2); cursor: pointer; }
+
+        /* MONITOR FRAME */
+        .main-monitor-container {
+            width: 95%; max-width: 430px; border: 4px solid var(--warna-border-monitor); border-radius: 12px;
+            background-color: #0c140c; padding: 20px; box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.5);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .monitor-header-title { color: var(--warna-teks-surat); font-size: 1.1rem; margin-top: 5px; margin-bottom: 20px; text-align: center; width: 100%; }
+        .inner-display-box { width: 100%; height: 260px; border: 2px solid #248010; background-color: var(--warna-bg-surat); border-radius: 8px; padding: 15px; color: var(--warna-teks-surat); font-size: 0.55rem; line-height: 1.6; overflow-y: auto; position: relative; margin-bottom: 20px; }
+        .skip-btn-wrapper { display: flex; justify-content: center; width: 100%; margin-top: 15px; margin-bottom: 5px; }
+        .btn-skip { background-color: #1e40af; border: 2px solid #3b82f6; color: #ffffff; font-family: 'Press Start 2P', monospace; font-size: 0.5rem; padding: 6px 16px; border-radius: 6px; cursor: pointer; }
+        .monitor-action-row { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+        .big-system-btn { width: 100%; font-family: 'Press Start 2P', monospace; font-size: 0.75rem; padding: 16px; color: white; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; text-transform: uppercase; box-shadow: 0 6px 0px rgba(0,0,0,0.3); }
+        .big-system-btn:active { transform: translateY(4px); box-shadow: 0 2px 0px rgba(0,0,0,0.3); }
+        .btn-next { background-color: #22c55e; }     
+        .btn-back { background-color: #ef4444; }     
+
+        /* PHOTOBOX */
+        .gallery-viewport { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+        .polaroid-card { background-color: #ffffff; padding: 8px 8px 18px 8px; border-radius: 2px; box-shadow: 0px 4px 10px rgba(0,0,0,0.8); width: 150px; display: flex; flex-direction: column; align-items: center; border: 1px solid #ccc; opacity: 0; transform: translateY(-30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .polaroid-card.printed { opacity: 1; transform: translateY(0); }
+        .polaroid-photo-area { width: 134px; height: 130px; background-color: #222; border: 1px solid #999; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .polaroid-photo-area img { width: 100%; height: 100%; object-fit: cover; }
+        .polaroid-title-label { font-family: 'Press Start 2P', monospace; font-size: 0.35rem; color: #111111; margin-top: 8px; text-align: center; }
+        .polaroid-card.video-item .polaroid-photo-area { background-color: #0c140c; cursor: pointer; }
+        .red-play-btn { width: 36px; height: 36px; background-color: #ef4444; border: 2px solid #ffffff; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+        .red-play-btn::after { content: ''; display: block; width: 0; height: 0; border-style: solid; border-width: 6px 0 6px 10px; border-color: transparent transparent transparent #ffffff; margin-left: 3px; }
+        .print-indicator-msg { font-size: 0.45rem; color: #ffcc00; text-align: center; margin-bottom: 10px; }
+        .gallery-action-box { width: 100%; display: flex; justify-content: center; margin-bottom: 10px; }
+        .btn-orange-action { background-color: #ea580c; border: 2px solid #ffffff; color: #ffffff; font-family: 'Press Start 2P', monospace; font-size: 0.5rem; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+
+        .video-popup-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 15px; }
+        .video-popup-modal.active { display: flex; }
+        .video-player-container { width: 100%; max-width: 360px; margin: 0 auto; border: 3px solid #ffcc00; background-color: #000000; position: relative; }
+        .video-player-container video { width: 100%; height: 480px; object-fit: cover; display: block; }
+        .close-modal-x { position: absolute; top: -12px; right: -12px; background-color: #ef4444; color: #fff; border: 2px solid #fff; width: 24px; height: 24px; border-radius: 50%; font-size: 0.6rem; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+
+        /* SPOTIFY THEME */
+        .spotify-container-layout { display: flex; flex-direction: column; width: 100%; height: 100%; background-color: var(--spotify-purple-dark); font-family: sans-serif; color: #ffffff; }
+        .spotify-banner-header { display: flex; align-items: flex-end; gap: 15px; padding: 15px; background: linear-gradient(to bottom, var(--spotify-purple-banner), var(--spotify-purple-light)); }
+        .album-cover-box { width: 80px; height: 80px; background-color: #222; box-shadow: 0 4px 15px rgba(0,0,0,0.5); flex-shrink: 0; overflow: hidden; border-radius: 4px; }
+        .album-cover-box img { width: 100%; height: 100%; object-fit: cover; }
+        .album-cover-box.playing-animation { animation: rotateAlbum 12s linear infinite; }
+        .album-meta-info { display: flex; flex-direction: column; gap: 4px; }
+        .meta-type-text { font-size: 10px; font-weight: bold; color: #b3b3b3; }
+        .meta-album-title { font-size: 18px; font-weight: 800; color: #ffffff; }
+        .meta-artist-stats { font-size: 10px; color: #b3b3b3; }
+        .spotify-main-content-view { padding: 12px; background: linear-gradient(to bottom, var(--spotify-purple-light) 0%, var(--spotify-purple-dark) 40%); flex-grow: 1; }
+        .spotify-action-controls-bar { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; }
+        .spotify-circle-play-btn { width: 42px; height: 42px; background-color: var(--spotify-green); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .spotify-circle-play-btn::after { content: ''; display: block; width: 0; height: 0; border-style: solid; border-width: 6px 0 6px 11px; border-color: transparent transparent transparent #000000; margin-left: 2px; }
+        .spotify-circle-play-btn.is-active-pause::after { content: ''; width: 10px; height: 12px; border-style: double; border-width: 0px 0px 0px 10px; border-color: #000; margin-left: 0; }
+
+        .spotify-tracks-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .spotify-tracks-table th { font-size: 9px; color: #b3b3b3; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .spotify-tracks-table td { padding: 8px 4px; font-size: 11px; color: #e5e5e5; }
+        .track-row-item { cursor: pointer; border-radius: 4px; }
+        .track-row-item:hover { background-color: rgba(255,255,255,0.08); }
+        .track-row-item.active-playing-row td { color: var(--spotify-green) !important; }
+        .cell-index-number { color: #b3b3b3; text-align: center; width: 25px; }
+        .cell-title-main { font-weight: 600; }
+        .cell-title-main span { display: block; font-size: 9px; color: #b3b3b3; margin-top: 2px; }
+        .cell-plays-count { color: #b3b3b3; text-align: right; }
+        .cell-duration { color: #b3b3b3; text-align: right; width: 40px; }
+
+        .spotify-bottom-playback-bar { background-color: #181818; border-top: 1px solid #282828; padding: 10px 15px; display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: auto; }
+        .playback-info-title-bottom { font-size: 10px; font-weight: bold; color: #ffffff; text-align: center; }
+        .playback-buttons-center { display: flex; align-items: center; gap: 15px; }
+        .player-mini-btn { background: none; border: none; color: #b3b3b3; font-size: 12px; cursor: pointer; }
+        .player-mini-btn.main-toggle-btn { width: 28px; height: 28px; background-color: #ffffff; color: #000000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 10px; }
+        .playback-progress-row { display: flex; align-items: center; width: 100%; gap: 8px; }
+        .time-stamp-lbl { font-size: 8px; color: #b3b3b3; width: 25px; text-align: center; }
+        .slider-progress-bg { flex-grow: 1; height: 3px; background-color: #535353; border-radius: 2px; position: relative; cursor: pointer; }
+        .slider-progress-fill { width: 0%; height: 100%; background-color: #ffffff; border-radius: 2px; position: absolute; top: 0; left: 0; }
+
+        @keyframes rotateAlbum { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 🎀🐰 GAME COQUETTE BUNNY STYLING */
+        #flappyCanvas {
+            width: 100%;
+            height: 340px; /* LAYAR DI-PERBESAR */
+            background: linear-gradient(to bottom, #2d1038 0%, #170720 100%);
+            display: block;
+            border-radius: 6px;
+        }
+        .flappy-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .flappy-start-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 5, 25, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            z-index: 10;
+        }
+        .game-status-box {
+            font-size: 0.5rem;
+            color: #f472b6;
+            margin-top: 10px;
+            text-align: center;
+            line-height: 1.5;
+            min-height: 35px;
+        }
+        .btn-start-game {
+            background-color: #f472b6;
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.6rem;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #db2777;
+        }
+        .btn-start-game:active { transform: translateY(2px); box-shadow: 0 2px 0 #db2777; }
+    </style>
+</head>
+<body>
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen">
+        <div class="monitor-box">
+            <div class="title-system">HEYTML-BOY</div>
+            <div class="status-row" id="status-container">
+                <span>Preparing birthday surprise...</span><span class="cursor-underscore">_</span>
+            </div>
+            <div class="progress-container">
+                 <div class="progress-bar" id="bar"></div>
+                <div class="percentage-text" id="percent">0%</div>
+            </div>
+            <div class="footer-text" id="smile-text">SMILE! ❤️</div>
+        </div>
+    </div>
+
+    <!-- GAMEBOY HOME -->
+    <div id="gameboy-screen">
+        <div class="gameboy-body">
+            <div class="gameboy-header">
+                <div class="power-led"><div class="led-dot"></div><span>POWER</span></div>
+                <div>HEYTML-BOY</div>
+            </div>
+
+            <div class="screen-frame">
+                <div class="lcd-screen">
+                    <div class="lcd-title" id="gb-lcd-title">Happy<br>Birthday!</div>
+                    <div class="lcd-sub" id="gb-lcd-sub">Press Start Button</div>
+                </div>
+                <div class="screen-footer">
+                    <span>DOT MATRIX WITH STEREO SOUND</span>
+                    <span>⚫ BATTERY</span>
+                </div>
+            </div>
+
+            <div class="menu-grid">
+                <button class="menu-btn btn-message" onclick="navigateToPage('message')">Message</button>
+                <button class="menu-btn btn-gallery" onclick="navigateToPage('gallery')">Gallery</button>
+                <button class="menu-btn btn-music" onclick="navigateToPage('music')">Music</button>
+                <button class="menu-btn btn-tetris" onclick="navigateToPage('game')">Bunny 🎀</button>
+            </div>
+
+            <div class="controls-row">
+                <div class="d-pad">
+                    <button class="d-pad-btn d-btn-up" onclick="clickDpad('ATAS')"></button>
+                    <button class="d-pad-btn d-btn-down" onclick="clickDpad('BAWAH')"></button>
+                    <button class="d-pad-btn d-btn-left" onclick="clickDpad('KIRI')"></button>
+                    <button class="d-pad-btn d-btn-right" onclick="clickDpad('KANAN')"></button>
+                    <div class="d-pad-horizontal"></div><div class="d-pad-vertical"></div><div class="d-pad-center"></div>
+                </div>
+                <div class="action-buttons">
+                    <button class="circle-btn" onclick="triggerFlappyJump()">B</button>
+                    <button class="circle-btn" onclick="triggerFlappyJump()">A</button>
+                </div>
+            </div>
+
+            <div class="system-buttons">
+                <div class="pill-btn-wrapper"><button class="pill-btn" onclick="clickSelect()"></button><span>SELECT</span></div>
+                <div class="pill-btn-wrapper"><button class="pill-btn" onclick="navigateToPage('message')"></button><span>START</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN 1: MESSAGE -->
+    <div id="monitor-message-page" class="main-monitor-container hidden">
+        <div class="monitor-header-title">Message</div>
+        <div class="inner-display-box" id="scrollBoxSurat">
+            <div id="typing-area"></div>
+            <div class="skip-btn-wrapper" id="skip-wrapper">
+                <button class="btn-skip" onclick="skipTyping()">SKIP</button>
+            </div>
+        </div>
+        <div class="monitor-action-row">
+            <button class="big-system-btn btn-next" onclick="navigateToPage('gallery')">Selanjutnya</button>
+            <button class="big-system-btn btn-back" onclick="returnToMainMenu()">Kembali</button>
+        </div>
+    </div>
+
+    <!-- HALAMAN 2: GALLERY -->
+    <div id="monitor-gallery-page" class="main-monitor-container hidden">
+        <div class="monitor-header-title">Photobox</div>
+        <div class="inner-display-box" id="scrollBoxGallery">
+            <div class="gallery-viewport" id="viewportGaleriItem"></div>
+        </div>
+        <div class="print-indicator-msg" id="textInfoPrint">Mesin cetak siap digunakan</div>
+        <div class="gallery-action-box" id="wrapperTombolAksi">
+            <button class="btn-orange-action" id="btnCetakUtama" onclick="executePhotoboxPrinting()">Mulai Cetak</button>
+        </div>
+        <div class="monitor-action-row">
+            <button class="big-system-btn btn-next" onclick="navigateToPage('music')">Selanjutnya</button>
+            <button class="big-system-btn btn-back" onclick="navigateToPage('message')">Kembali</button>
+        </div>
+
+        <div class="video-popup-modal" id="modalVideoPlayer">
+            <div class="video-player-container">
+                <button class="close-modal-x" onclick="closeVideoPopup()">X</button>
+                <div class="video-modal-header">Clip Dump</div>
+                <video id="htmlVideoDump" src="clip.mp4" controls></video>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN 3: MUSIC BOX (SPOTIFY THEME) -->
+    <div id="monitor-music-page" class="main-monitor-container hidden">
+        <div class="monitor-header-title">Music Box</div>
+        
+        <div class="inner-display-box" style="height:350px; padding:0; overflow:hidden; border:2px solid var(--spotify-purple-banner); background-color:var(--spotify-purple-dark); margin-bottom:15px;">
+            <div class="spotify-container-layout">
+                <div class="spotify-banner-header">
+                    <div class="album-cover-box" id="albumCoverWrapper">
+                        <img src="76157.jpg" id="imgAlbumCover" alt="Currents Cover">
+                    </div>
+                    <div class="album-meta-info">
+                        <div class="meta-type-text">ALBUM</div>
+                        <div class="meta-album-title">Currents (Cila Edition)</div>
+                        <div class="meta-artist-stats">By <strong>Tame Impala</strong> • 2026 • 5 songs</div>
+                    </div>
+                </div>
+
+                <div class="spotify-main-content-view" style="overflow-y: auto; height: 180px;">
+                    <div class="spotify-action-controls-bar">
+                        <button class="spotify-circle-play-btn" id="btnBigCirclePlay" onclick="togglePlayPauseMusic()"></button>
+                    </div>
+
+                    <table class="spotify-tracks-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center; width: 25px;">#</th>
+                                <th>TITLE</th>
+                                <th style="text-align: right;">PLAYS</th>
+                                <th style="text-align: right; padding-right: 10px;">🕒</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spotifyTrackListContainer"></tbody>
+                    </table>
+                </div>
+
+                <div class="spotify-bottom-playback-bar">
+                    <div class="playback-info-title-bottom" id="lblBottomTrackName">Let It Happen - Tame Impala</div>
+                    <div class="playback-buttons-center">
+                        <button class="player-mini-btn" onclick="previousSongTrack()">⏮</button>
+                        <button class="player-mini-btn main-toggle-btn" id="btnMiniPlayPause" onclick="togglePlayPauseMusic()">▶</button>
+                        <button class="player-mini-btn" onclick="nextSongTrack()">⏭</button>
+                    </div>
+                    <div class="playback-progress-row">
+                        <div class="time-stamp-lbl" id="lblCurrentTime">0:00</div>
+                        <div class="slider-progress-bg" onclick="seekAudioTime(event)">
+                            <div class="slider-progress-fill" id="progressFillBar"></div>
+                        </div>
+                        <div class="time-stamp-lbl" id="lblTotalDuration">0:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <audio id="coreAudioEngine" src=""></audio>
+
+        <div class="monitor-action-row">
+            <button class="big-system-btn btn-next" onclick="navigateToPage('game')">Selanjutnya</button>
+            <button class="big-system-btn btn-back" onclick="navigateToPage('gallery')">Kembali</button>
+        </div>
+    </div>
+
+    <!-- HALAMAN 4: GAME COQUETTE BUNNY 🎀🐰 -->
+    <div id="monitor-game-page" class="main-monitor-container hidden">
+        <div class="monitor-header-title" style="color: #f472b6;">Coquette Bunny 🎀</div>
+        
+        <div class="inner-display-box" style="height: 345px; padding:0; overflow:hidden; position:relative; border: 2px solid #f472b6; margin-bottom: 10px;">
+            <div class="flappy-container">
+                <canvas id="flappyCanvas" width="300" height="340"></canvas>
+                <div class="flappy-start-overlay" id="flappyOverlay">
+                    <div style="font-size: 0.75rem; margin-bottom: 8px; color: #f472b6;">BUNNY FLY 🎀🐰</div>
+                    <button class="btn-start-game" id="btnStartFlappy" onclick="startFlappyGame()">TAP TO PLAY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-status-box" id="gameStatusBoxText">
+            Bantu Kelinci Coquette Terbang! 🎀<br>Sentuh A/B/TAP untuk melompat.
+        </div>
+
+        <div class="monitor-action-row" style="margin-top: 10px;">
+            <button class="big-system-btn btn-next" style="background-color:#f472b6;" onclick="triggerFlappyJump()">TAP / JUMP 🎀</button>
+            <button class="big-system-btn btn-back" onclick="navigateToPage('music')">Kembali</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Main
+        const bar = document.getElementById('bar');
+        const percent = document.getElementById('percent');
+        const smileText = document.getElementById('smile-text');
+        const statusContainer = document.getElementById('status-container');
+        const loadingScreen = document.getElementById('loading-screen');
+        
+        const gameboyScreen = document.getElementById('gameboy-screen');
+        const pageMessage = document.getElementById('monitor-message-page');
+        const pageGallery = document.getElementById('monitor-gallery-page');
+        const pageMusic = document.getElementById('monitor-music-page');
+        const pageGame = document.getElementById('monitor-game-page');
+        
+        const typingArea = document.getElementById('typing-area');
+        const skipWrapper = document.getElementById('skip-wrapper');
+        const scrollBoxSurat = document.getElementById('scrollBoxSurat');
+        const gbLcdTitle = document.getElementById('gb-lcd-title');
+        const gbLcdSub = document.getElementById('gb-lcd-sub');
+
+        // Database Gallery
+        const databaseGallery = [
+            { type: 'image', src: '76157.jpg', caption: '20/04/26 ❤️' },
+            { type: 'image', src: '76159.jpg', caption: 'Beautiful Cila' },
+            { type: 'image', src: '76160.jpg', caption: 'Momen Kocak ✨' },
+            { type: 'image', src: '76161.jpg', caption: 'SMILE! 🥰' },
+            { type: 'video', src: 'clip.mp4', caption: 'Clip Dump 🎥' }
+        ];
+
+        // Database Music
+        const databasePlaylist = [
+            { id: 0, title: "Let It Happen", artist: "Tame Impala", src: "let_it_happen.mp3", plays: "772,385,840", duration: "7:47", cover: "76157.jpg" },
+            { id: 1, title: "Nangs", artist: "Tame Impala", src: "nangs.mp3", plays: "240,442,458", duration: "1:47", cover: "76159.jpg" },
+            { id: 2, title: "The Less I Know The Better", artist: "Tame Impala", src: "less_i_know.mp3", plays: "1,543,109,211", duration: "3:36", cover: "76160.jpg" },
+            { id: 3, title: "The Moment", artist: "Tame Impala", src: "the_moment.mp3", plays: "184,366,050", duration: "4:15", cover: "76161.jpg" },
+            { id: 4, title: "Eventually", artist: "Tame Impala", src: "eventually.mp3", plays: "310,952,114", duration: "5:19", cover: "76157.jpg" }
+        ];
+
+        let currentActiveSongIndex = 0;
+        let isMusicPlayingStatus = false;
+
+        const coreAudioEngine = document.getElementById('coreAudioEngine');
+        const albumCoverWrapper = document.getElementById('albumCoverWrapper');
+        const imgAlbumCover = document.getElementById('imgAlbumCover');
+        const lblBottomTrackName = document.getElementById('lblBottomTrackName');
+        const btnBigCirclePlay = document.getElementById('btnBigCirclePlay');
+        const btnMiniPlayPause = document.getElementById('btnMiniPlayPause');
+        const progressFillBar = document.getElementById('progressFillBar');
+        const lblCurrentTime = document.getElementById('lblCurrentTime');
+        const lblTotalDuration = document.getElementById('lblTotalDuration');
+
+        // Loading Progress
+        let progressValue = 0;
+        const loadingInterval = setInterval(() => {
+            if (progressValue >= 100) {
+                clearInterval(loadingInterval);
+                smileText.classList.add('show');
+                setTimeout(() => { loadingScreen.style.display = 'none'; }, 1500);
+            } else {
+                progressValue++;
+                bar.style.width = progressValue + '%';
+                percent.innerText = progressValue + '%';
+                if (progressValue >= 85 && progressValue < 100) {
+                    statusContainer.innerHTML = '<span>> READY!</span><span class="cursor-underscore">_</span>';
+                }
+            }
+        }, 30);
+
+        // Surat Text
+        const fullSuratText = `Hi Cel,<br><br>Happy Birthday!<br><br>Hari ini adalah hari yang luar biasa karena orang yang luar biasa juga sedang merayakan hari kelahirannya.
+Semoga segala keinginanmu tercapai, apalagi yang kocak-kocak dan gak biasa, karena kamu tuh unik banget!
+Aku selalu bersyukur bisa ngelihat kamu jadi versi terbaik dari dirimu, yang kadang-kadang lucu banget pas lagi baper, tapi juga selalu bikin aku tersenum tanpa henti.<br><br>Makasih udah jadi temen curhat, partner in crime, dan sumber inspirasi sehari-hari.
+Semoga tahun ini kamu makin kece, makin banyak momen bahagia, dan makin dicintai, karena kamu emang pantas dapetin semua itu.
+Jangan lupa, kita bakal terus jalan bareng, ngejar mimpi, dan ngelewatin segala drama hidup dengan tawa.<br><br>I love you <3`;
+        let typingIndex = 0;
+        let typingTimeout = null;
+
+        function navigateToPage(target) {
+            gameboyScreen.classList.add('hidden');
+            pageMessage.classList.add('hidden');
+            pageGallery.classList.add('hidden');
+            pageMusic.classList.add('hidden');
+            pageGame.classList.add('hidden');
+            clearTimeout(typingTimeout);
+
+            if (target === 'message') {
+                pageMessage.classList.remove('hidden');
+                startTypingEffect();
+            } else if (target === 'gallery') {
+                pageGallery.classList.remove('hidden');
+                clearAndResetGalleryLayout();
+            } else if (target === 'music') {
+                pageMusic.classList.remove('hidden');
+                renderSpotifyTracksTable();
+            } else if (target === 'game') {
+                pageGame.classList.remove('hidden');
+                initFlappyCanvas();
+            }
+        }
+
+        // Typing logic
+        function startTypingEffect() {
+            typingArea.innerHTML = "";
+            skipWrapper.style.display = "flex";
+            typingIndex = 0;
+            typeCharacter();
+        }
+
+        function typeCharacter() {
+            if (fullSuratText.substr(typingIndex, 4) === "<br>") {
+                typingArea.innerHTML += "<br>";
+                typingIndex += 4;
+            } else {
+                typingArea.innerHTML += fullSuratText.charAt(typingIndex);
+                typingIndex++;
+            }
+            scrollBoxSurat.scrollTop = scrollBoxSurat.scrollHeight;
+            if (typingIndex < fullSuratText.length) {
+                typingTimeout = setTimeout(typeCharacter, 45);
+            } else {
+                skipWrapper.style.display = "none";
+            }
+        }
+
+        function skipTyping() {
+            clearTimeout(typingTimeout);
+            typingArea.innerHTML = fullSuratText; 
+            skipWrapper.style.display = "none";   
+            scrollBoxSurat.scrollTop = scrollBoxSurat.scrollHeight;
+        }
+
+        // Photobox Logic
+        function clearAndResetGalleryLayout() {
+            document.getElementById('viewportGaleriItem').innerHTML = '';
+            document.getElementById('textInfoPrint').textContent = 'Mesin cetak siap digunakan';
+            document.getElementById('wrapperTombolAksi').innerHTML = `<button class="btn-orange-action" onclick="executePhotoboxPrinting()">Mulai Cetak</button>`;
+        }
+
+        async function executePhotoboxPrinting() {
+            const container = document.getElementById('viewportGaleriItem');
+            const infoText = document.getElementById('textInfoPrint');
+            document.getElementById('wrapperTombolAksi').innerHTML = ''; 
+
+            infoText.textContent = "Menghubungkan ke Photobox...";
+            await timeDelayHelper(1000);
+
+            for (let i = 0; i < databaseGallery.length; i++) {
+                const item = databaseGallery[i];
+                const count = i + 1;
+
+                for (let percent = 0; percent <= 100; percent += 20) {
+                    infoText.textContent = `Mencetak file ${count} dari ${databaseGallery.length}... (${percent}%)`;
+                    await timeDelayHelper(120);
+                }
+
+                const card = document.createElement('div');
+                card.className = `polaroid-card ${item.type === 'video' ? 'video-item' : ''}`;
+                if (item.type === 'image') {
+                    card.innerHTML = `<div class="polaroid-photo-area"><img src="${item.src}"></div><div class="polaroid-title-label">${item.caption}</div>`;
+                } else {
+                    card.innerHTML = `<div class="polaroid-photo-area" onclick="openVideoPopup()"><div class="red-play-btn"></div></div><div class="polaroid-title-label">${item.caption}</div>`;
+                }
+
+                container.appendChild(card);
+                setTimeout(() => {
+                    card.classList.add('printed');
+                    document.getElementById('scrollBoxGallery').scrollTop = document.getElementById('scrollBoxGallery').scrollHeight;
+                }, 50);
+
+                await timeDelayHelper(800);
+            }
+
+            infoText.textContent = "Proses Cetak Berhasil Selesai!";
+            document.getElementById('wrapperTombolAksi').innerHTML = `<button class="btn-orange-action" onclick="executePhotoboxPrinting()">CETAK ULANG</button>`;
+        }
+
+        function timeDelayHelper(ms) { return new Promise(res => setTimeout(res, ms)); }
+        function openVideoPopup() { document.getElementById('modalVideoPlayer').classList.add('active'); document.getElementById('htmlVideoDump').play(); }
+        function closeVideoPopup() { document.getElementById('modalVideoPlayer').classList.remove('active'); document.getElementById('htmlVideoDump').pause(); document.getElementById('htmlVideoDump').currentTime = 0; }
+
+        // Music Logic
+        function renderSpotifyTracksTable() {
+            const tbody = document.getElementById('spotifyTrackListContainer');
+            tbody.innerHTML = '';
+            databasePlaylist.forEach((track, index) => {
+                const tr = document.createElement('tr');
+                tr.className = `track-row-item ${index === currentActiveSongIndex ? 'active-playing-row' : ''}`;
+                tr.setAttribute('onclick', `selectAndPlayDirectSong(${index})`);
+                tr.innerHTML = `
+                    <td class="cell-index-number">${index + 1}</td>
+                    <td class="cell-title-main">${track.title} <span>${track.artist}</span></td>
+                    <td class="cell-plays-count">${track.plays}</td>
+                    <td class="cell-duration">${track.duration}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            if(coreAudioEngine.getAttribute('src') === "") setTrackSourceEngine(currentActiveSongIndex);
+        }
+
+        function setTrackSourceEngine(index) {
+            const track = databasePlaylist[index];
+            coreAudioEngine.src = track.src;
+            lblBottomTrackName.textContent = `${track.title} - ${track.artist}`;
+            imgAlbumCover.src = track.cover;
+            lblTotalDuration.textContent = track.duration;
+            lblCurrentTime.textContent = "0:00";
+            progressFillBar.style.width = "0%";
+        }
+
+        function selectAndPlayDirectSong(index) {
+            if(currentActiveSongIndex === index && isMusicPlayingStatus) { togglePlayPauseMusic(); return; }
+            currentActiveSongIndex = index;
+            setTrackSourceEngine(currentActiveSongIndex);
+            isMusicPlayingStatus = false;
+            togglePlayPauseMusic();
+        }
+
+        function togglePlayPauseMusic() {
+            if(!isMusicPlayingStatus) {
+                coreAudioEngine.play().then(() => { isMusicPlayingStatus = true; updatePlaybackVisualStates(true); }).catch(() => { isMusicPlayingStatus = true; updatePlaybackVisualStates(true); });
+            } else {
+                coreAudioEngine.pause();
+                isMusicPlayingStatus = false;
+                updatePlaybackVisualStates(false);
+            }
+        }
+
+        function updatePlaybackVisualStates(isPlaying) {
+            if(isPlaying) {
+                btnBigCirclePlay.classList.add('is-active-pause');
+                btnMiniPlayPause.textContent = "⏸";
+                albumCoverWrapper.classList.add('playing-animation');
+            } else {
+                btnBigCirclePlay.classList.remove('is-active-pause');
+                btnMiniPlayPause.textContent = "▶";
+                albumCoverWrapper.classList.remove('playing-animation');
+            }
+            renderSpotifyTracksTable();
+        }
+
+        function nextSongTrack() { currentActiveSongIndex = (currentActiveSongIndex + 1) % databasePlaylist.length; setTrackSourceEngine(currentActiveSongIndex); isMusicPlayingStatus = false; togglePlayPauseMusic(); }
+        function previousSongTrack() { currentActiveSongIndex = (currentActiveSongIndex - 1 + databasePlaylist.length) % databasePlaylist.length; setTrackSourceEngine(currentActiveSongIndex); isMusicPlayingStatus = false; togglePlayPauseMusic(); }
+
+        coreAudioEngine.ontimeupdate = function() {
+            if(coreAudioEngine.duration) {
+                const current = coreAudioEngine.currentTime;
+                progressFillBar.style.width = ((current / coreAudioEngine.duration) * 100) + "%";
+                lblCurrentTime.textContent = formatTimeHelper(current);
+            }
+        };
+
+        function formatTimeHelper(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function seekAudioTime(event) {
+            const clickX = event.offsetX;
+            const barWidth = event.currentTarget.clientWidth;
+            if(coreAudioEngine.duration) coreAudioEngine.currentTime = (clickX / barWidth) * coreAudioEngine.duration;
+        }
+
+        coreAudioEngine.onended = function() { nextSongTrack(); };
+
+        function returnToMainMenu() {
+            clearTimeout(typingTimeout);
+            pageMessage.classList.add('hidden');
+            pageGallery.classList.add('hidden');
+            pageMusic.classList.add('hidden');
+            pageGame.classList.add('hidden');
+            gameboyScreen.classList.remove('hidden');
+            gbLcdTitle.innerHTML = "Happy<br>Birthday!";
+            gbLcdSub.innerText = "Press Start Button";
+        }
+
+        // =======================================================
+        // 🎀🐰 GAME ENGINE: COQUETTE BUNNY FLY
+        // =======================================================
+        let canvas, ctx;
+        let bunnyY, velocity, gravity, jumpForce, pipeSpeed;
+        let pipes = [];
+        let flappyScore = 0;
+        let isFlappyRunning = false;
+        let flappyAnimationLoop = null;
+        let hoverAngle = 0; // Animasi melayang santai di awal
+
+        function initFlappyCanvas() {
+            canvas = document.getElementById('flappyCanvas');
+            ctx = canvas.getContext('2d');
+            resetFlappyState();
+            document.getElementById('flappyOverlay').style.display = 'flex';
+            document.getElementById('btnStartFlappy').textContent = 'TAP TO PLAY';
+            document.getElementById('gameStatusBoxText').innerHTML = 'Bantu Kelinci Coquette Terbang! 🎀<br>Sentuh TAP / JUMP untuk melompat.';
+            
+            if (flappyAnimationLoop) cancelAnimationFrame(flappyAnimationLoop);
+            loopHoverIdleState();
+        }
+
+        function resetFlappyState() {
+            bunnyY = canvas.height / 2;
+            velocity = 0;
+            // Kecepatan & gravitasi lambat di awal
+            gravity = 0.22;
+            jumpForce = -4.2;
+            pipeSpeed = 1.4; 
+            pipes = [];
+            flappyScore = 0;
+        }
+
+        // State melayang santai pas awal (GAK LANGSUNG JATUH)
+        function loopHoverIdleState() {
+            if (isFlappyRunning) return;
+
+            ctx.fillStyle = '#1e092b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            hoverAngle += 0.05;
+            let idleY = (canvas.height / 2) + Math.sin(hoverAngle) * 8;
+
+            drawCoquetteBunny(60, idleY);
+
+            ctx.fillStyle = '#f472b6';
+            ctx.font = '8px "Press Start 2P"';
+            ctx.fillText("READY?", 120, canvas.height / 2 - 40);
+
+            flappyAnimationLoop = requestAnimationFrame(loopHoverIdleState);
+        }
+
+        function startFlappyGame() {
+            resetFlappyState();
+            isFlappyRunning = true;
+            document.getElementById('flappyOverlay').style.display = 'none';
+            document.getElementById('gameStatusBoxText').innerHTML = 'Skor Kamu: <span style="color:#ffcc00;">0</span>';
+            if (flappyAnimationLoop) cancelAnimationFrame(flappyAnimationLoop);
+            loopFlappyGame();
+        }
+
+        function triggerFlappyJump() {
+            if (!isFlappyRunning) {
+                startFlappyGame();
+            } else {
+                velocity = jumpForce;
+            }
+        }
+
+        function loopFlappyGame() {
+            if (!isFlappyRunning) return;
+
+            // Penyesuaian kesulitan bertahap berdasarkan SKOR
+            if (flappyScore >= 5 && flappyScore < 10) {
+                pipeSpeed = 1.8;
+                gravity = 0.25;
+            } else if (flappyScore >= 10) {
+                pipeSpeed = 2.3;
+                gravity = 0.28;
+            }
+
+            // Update Fisika Kelinci
+            velocity += gravity;
+            bunnyY += velocity;
+
+            // Spawning Tiang Neon Coquette
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 120) {
+                let gapHeight = 90; // Celah cukup lebar biar santai
+                let minPipeHeight = 30;
+                let topPipeHeight = Math.floor(Math.random() * (canvas.height - gapHeight - (minPipeHeight * 2))) + minPipeHeight;
+                pipes.push({
+                    x: canvas.width,
+                    top: topPipeHeight,
+                    bottom: canvas.height - topPipeHeight - gapHeight,
+                    passed: false
+                });
+            }
+
+            // Gerakkan Tiang
+            pipes.forEach(pipe => { pipe.x -= pipeSpeed; });
+
+            // Cek Tabrakan Atas / Bawah Layar
+            if (bunnyY > canvas.height - 15 || bunnyY < 15) {
+                endFlappyGame();
+                return;
+            }
+
+            // Render Backgroud Layar Game
+            ctx.fillStyle = '#1e092b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Render Tiang Pastel Pink / Purple
+            pipes.forEach(pipe => {
+                ctx.fillStyle = '#f472b6';
+                ctx.fillRect(pipe.x, 0, 26, pipe.top);
+                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, 26, pipe.bottom);
+
+                // Aksesori Pita Kecil di Tiang (Estetik Coquette)
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(pipe.x - 2, pipe.top - 6, 30, 6);
+                ctx.fillRect(pipe.x - 2, canvas.height - pipe.bottom, 30, 6);
+
+                // Hitbox Collision Check
+                if (60 + 12 > pipe.x && 60 - 12 < pipe.x + 26) {
+                    if (bunnyY - 12 < pipe.top || bunnyY + 12 > canvas.height - pipe.bottom) {
+                        endFlappyGame();
+                        return;
+                    }
+                }
+
+                // Tambah Skor
+                if (!pipe.passed && pipe.x < 60) {
+                    pipe.passed = true;
+                    flappyScore++;
+                    document.getElementById('gameStatusBoxText').innerHTML = `Skor Kamu: <span style="color:#ffcc00; font-size: 0.7rem;">${flappyScore}</span> 🔥`;
+                }
+            });
+
+            // Hapus Tiang di luar layar
+            if (pipes.length > 0 && pipes[0].x < -35) pipes.shift();
+
+            // Render Karakter KELINCI COQUETTE 🎀🐰
+            drawCoquetteBunny(60, bunnyY);
+
+            // Render Teks Skor di Atas
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '10px "Press Start 2P"';
+            ctx.fillText(`SCORE: ${flappyScore}`, 12, 24);
+
+            flappyAnimationLoop = requestAnimationFrame(loopFlappyGame);
+        }
+
+        // Function menggambar Kelinci Coquette 🎀🐰
+        function drawCoquetteBunny(x, y) {
+            // Telinga Kelinci
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(x - 5, y - 14, 4, 10, -0.1, 0, Math.PI * 2);
+            ctx.ellipse(x + 5, y - 14, 4, 10, 0.1, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Dalam Telinga Pink
+            ctx.fillStyle = '#f472b6';
+            ctx.beginPath();
+            ctx.ellipse(x - 5, y - 14, 2, 6, -0.1, 0, Math.PI * 2);
+            ctx.ellipse(x + 5, y - 14, 2, 6, 0.1, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Kepala Kelinci
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mata Imut
+            ctx.fillStyle = '#222222';
+            ctx.beginPath();
+            ctx.arc(x - 4, y - 2, 1.8, 0, Math.PI * 2);
+            ctx.arc(x + 4, y - 2, 1.8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hidung & Pipi Pink (Blush)
+            ctx.fillStyle = '#f472b6';
+            ctx.beginPath();
+            ctx.arc(x, y + 2, 1.2, 0, Math.PI * 2); // Hidung
+            ctx.arc(x - 7, y + 2, 2.5, 0, Math.PI * 2); // Blush Kiri
+            ctx.arc(x + 7, y + 2, 2.5, 0, Math.PI * 2); // Blush Kanan
+            ctx.fill();
+
+            // 🎀 PITA COQUETTE (Coquette Pink Bow) di Samping Telinga
+            ctx.fillStyle = '#ec4899';
+            // Pita Kiri
+            ctx.beginPath(); ctx.arc(x - 9, y - 8, 3.5, 0, Math.PI * 2); ctx.fill();
+            // Pita Kanan
+            ctx.beginPath(); ctx.arc(x - 3, y - 8, 3.5, 0, Math.PI * 2); ctx.fill();
+            // Simpul Tengah
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath(); ctx.arc(x - 6, y - 8, 1.8, 0, Math.PI * 2); ctx.fill();
+        }
+
+        function endFlappyGame() {
+            isFlappyRunning = false;
+            document.getElementById('flappyOverlay').style.display = 'flex';
+            document.getElementById('btnStartFlappy').textContent = 'MAIN LAGI';
+            document.getElementById('gameStatusBoxText').innerHTML = `GAME OVER!<br>Skor Akhir Cila: <strong style="color:#ffcc00; font-size:0.7rem;">${flappyScore}</strong> 🎀<br>Hebat Banget! ❤️`;
+        }
+
+        // Listener Keyboard Laptop/PC
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+                if(!pageGame.classList.contains('hidden')) triggerFlappyJump();
+            }
+        });
+
+        function clickDpad(arah) { gbLcdTitle.innerText = `D-PAD`; gbLcdSub.innerText = `Arah: ${arah}`; }
+        function clickActionButton(namaTombol) { gbLcdTitle.innerText = `BUTTON ${namaTombol}`; gbLcdSub.innerText = `Kamu tekan ${namaTombol}!`; }
+        let selectState = false;
+        function clickSelect() { selectState = !selectState; gbLcdSub.innerText = selectState ? "Made for Cila ❤️" : "Press Start Button"; }
+    </script>
+</body>
+</html>
