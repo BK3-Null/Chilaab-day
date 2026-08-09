@@ -7,9 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
-            --warna-border-monitor: #ffcc00;
+            --warna-border-monitor: #facaf7;
             --warna-bg-surat: #050f05;
-            --warna-teks-surat: #39ff14;
+            --warna-teks-surat: #b6f0f2;
             --warna-body-biru: #2b59c3;
             
             --spotify-purple-dark: #12072B;
@@ -123,8 +123,8 @@
         .monitor-action-row { width: 100%; display: flex; flex-direction: column; gap: 12px; }
         .big-system-btn { width: 100%; font-family: 'Press Start 2P', monospace; font-size: 0.75rem; padding: 16px; color: white; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; text-transform: uppercase; box-shadow: 0 6px 0px rgba(0,0,0,0.3); }
         .big-system-btn:active { transform: translateY(4px); box-shadow: 0 2px 0px rgba(0,0,0,0.3); }
-        .btn-next { background-color: #22c55e; }     
-        .btn-back { background-color: #ef4444; }     
+        .btn-next { background-color: #faf5f9; color: #f872db;}     
+        .btn-back { background-color: #f872db; }     
 
         /* PHOTOBOX */
         .gallery-viewport { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
@@ -420,7 +420,7 @@
         </div>
 
         <div class="monitor-action-row" style="margin-top: 10px;">
-            <button class="big-system-btn btn-next" style="background-color:#f472b6;" onclick="triggerFlappyJump()">TAP / JUMP 🎀</button>
+            <button class="big-system-btn btn-next" style="background-color:#faf5f9;" onclick="triggerFlappyJump()">TAP / JUMP</button>
             <button class="big-system-btn btn-back" onclick="navigateToPage('music')">Kembali</button>
         </div>
     </div>
